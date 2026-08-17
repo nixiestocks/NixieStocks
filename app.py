@@ -1,7 +1,15 @@
 import streamlit as st
 
-from components.home import home_page
-from components.dashboard import dashboard_page
+import components.home as home_module
+import components.dashboard as dashboard_module
+
+from data.live_market import (
+    load_live_home_market_data,
+    load_live_market_status,
+    load_live_stock_info,
+    load_dashboard_history,
+    augment_history_with_live_session,
+)
 
 
 st.set_page_config(
@@ -39,6 +47,77 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# =========================================================
+# LIVE MARKET OVERLAYS
+#
+# Home ticker + market cards: 5-minute intraday data.
+# Dashboard NIFTY/SENSEX: 5-minute intraday data.
+# Dashboard current quote: short cache.
+# Historical chart: today's intraday session is added visually.
+# AI + Daily Returns: keep completed 1-day history unchanged.
+# =========================================================
+
+home_module._load_home_market_data = (
+    load_live_home_market_data
+)
+
+dashboard_module._load_market_status = (
+    load_live_market_status
+)
+
+dashboard_module._load_stock_info = (
+    load_live_stock_info
+)
+
+dashboard_module._load_history = (
+    load_dashboard_history
+)
+
+
+# Keep the original dashboard chart function only once across
+# Streamlit reruns, then feed it an augmented 1Y history for display.
+if not hasattr(
+    dashboard_module,
+    "_t7_original_render_chart_panel",
+):
+    dashboard_module._t7_original_render_chart_panel = (
+        dashboard_module._render_chart_panel
+    )
+
+
+def _render_chart_panel_live(
+    info,
+    preloaded_1y=None,
+):
+    chart_history = preloaded_1y
+
+    if (
+        chart_history is not None
+        and not chart_history.empty
+    ):
+        chart_history = augment_history_with_live_session(
+            chart_history,
+            info["symbol"],
+        )
+
+    return (
+        dashboard_module
+        ._t7_original_render_chart_panel(
+            info,
+            preloaded_1y=chart_history,
+        )
+    )
+
+
+dashboard_module._render_chart_panel = (
+    _render_chart_panel_live
+)
+
+
+home_page = home_module.home_page
+dashboard_page = dashboard_module.dashboard_page
 
 
 if "page" not in st.session_state:
