@@ -1,0 +1,536 @@
+/* =========================================================
+   TEAM7 - Prototype-inspired professional financial UI
+   ========================================================= */
+
+:root {
+    --bg: #050816;
+    --panel: rgba(13, 20, 36, 0.88);
+    --panel-2: rgba(15, 24, 43, 0.94);
+    --border: rgba(137, 159, 204, 0.20);
+    --border-strong: rgba(101, 139, 224, 0.42);
+    --text: #f8fafc;
+    --muted: #8f9bb3;
+    --green: #39e991;
+    --red: #ff5364;
+    --blue: #5b8cff;
+}
+
+html,
+body,
+[data-testid="stAppViewContainer"],
+.stApp {
+    background:
+        radial-gradient(circle at 50% 0%, rgba(41, 73, 128, 0.12), transparent 32%),
+        radial-gradient(circle at 10% 80%, rgba(0, 255, 157, 0.035), transparent 24%),
+        #050816;
+    color: var(--text);
+}
+
+html,
+body,
+[class*="css"] {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.block-container {
+    max-width: 1480px;
+    padding-top: 1.35rem;
+    padding-bottom: 2rem;
+}
+
+#MainMenu,
+footer,
+header {
+    visibility: hidden;
+}
+
+/* =========================================================
+   HOME HERO
+   ========================================================= */
+
+.prototype-hero {
+    text-align: center;
+    padding-top: 0.35rem;
+    padding-bottom: 1.1rem;
+}
+
+.prototype-brand {
+    color: #ffffff;
+    font-size: clamp(2.5rem, 4vw, 4.2rem);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+}
+
+.prototype-subtitle {
+    margin-top: 0.72rem;
+    color: #9aa6bd;
+    font-size: 0.88rem;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+}
+
+.search-helper {
+    text-align: center;
+    color: #68758e;
+    font-size: 0.78rem;
+    margin-top: 0.55rem;
+}
+
+/* Searchbox component */
+div[data-baseweb="select"] > div {
+    min-height: 52px;
+    background: linear-gradient(180deg, rgba(16, 24, 42, 0.98), rgba(10, 16, 29, 0.98)) !important;
+    border: 1px solid rgba(91, 140, 255, 0.70) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 0 0 1px rgba(91, 140, 255, 0.08), 0 12px 34px rgba(0, 0, 0, 0.24) !important;
+}
+
+div[data-baseweb="select"] input {
+    color: #eef2ff !important;
+    font-size: 0.96rem !important;
+}
+
+div[data-baseweb="popover"] {
+    z-index: 9999 !important;
+}
+
+ul[role="listbox"] {
+    background: rgba(8, 14, 26, 0.99) !important;
+    border: 1px solid rgba(137, 159, 204, 0.20) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45) !important;
+}
+
+li[role="option"] {
+    color: #e9eef9 !important;
+    border-bottom: 1px solid rgba(137, 159, 204, 0.08) !important;
+}
+
+/* =========================================================
+   SECTION HEADERS
+   ========================================================= */
+
+.section-heading-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 1.45rem 0 0.7rem;
+}
+
+.section-heading,
+.mover-section-title,
+.news-section-title {
+    color: #f5f7fb;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.live-label {
+    color: #9ca8bc;
+    font-size: 0.78rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+    display: inline-block;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 10px rgba(57, 233, 145, 0.75);
+}
+
+/* =========================================================
+   MARKET OVERVIEW CARDS
+   ========================================================= */
+
+.prototype-market-card {
+    min-height: 135px;
+    position: relative;
+    overflow: hidden;
+    padding: 18px 20px 13px;
+    border-radius: 12px;
+    background:
+        radial-gradient(circle at 82% 28%, rgba(91, 140, 255, 0.08), transparent 34%),
+        linear-gradient(135deg, rgba(17, 27, 47, 0.94), rgba(8, 14, 27, 0.94));
+    border: 1px solid rgba(126, 150, 197, 0.24);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025), 0 10px 30px rgba(0, 0, 0, 0.16);
+}
+
+.prototype-market-card.positive {
+    background:
+        radial-gradient(circle at 75% 78%, rgba(57, 233, 145, 0.10), transparent 42%),
+        linear-gradient(135deg, rgba(17, 27, 47, 0.94), rgba(8, 14, 27, 0.94));
+}
+
+.prototype-market-card.negative {
+    background:
+        radial-gradient(circle at 75% 78%, rgba(255, 83, 100, 0.09), transparent 42%),
+        linear-gradient(135deg, rgba(17, 27, 47, 0.94), rgba(8, 14, 27, 0.94));
+}
+
+.market-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 2;
+}
+
+.prototype-market-name {
+    color: #f8fafc;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.prototype-market-price {
+    color: #ffffff;
+    font-size: 1.65rem;
+    font-weight: 650;
+    letter-spacing: -0.025em;
+    margin-top: 3px;
+}
+
+.prototype-market-change {
+    margin-top: 3px;
+    font-size: 0.80rem;
+    font-weight: 650;
+}
+
+.prototype-market-change.positive {
+    color: var(--green);
+}
+
+.prototype-market-change.negative {
+    color: var(--red);
+}
+
+.market-index-badge {
+    min-width: 42px;
+    height: 42px;
+    padding: 0 8px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aebbd1;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(137, 159, 204, 0.13);
+}
+
+.market-sparkline {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 4px;
+    width: 100%;
+    height: 34px;
+    opacity: 0.9;
+}
+
+/* =========================================================
+   MOVERS
+   ========================================================= */
+
+.mover-section-title {
+    margin: 1.15rem 0 0.65rem;
+}
+
+.mover-section-title.gain {
+    color: #f5f7fb;
+}
+
+.mover-section-title.loss {
+    color: #f5f7fb;
+}
+
+.mover-card {
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 13px;
+    margin-bottom: 7px;
+    border-radius: 11px;
+    background: linear-gradient(90deg, rgba(12, 22, 38, 0.96), rgba(11, 15, 28, 0.93));
+}
+
+.mover-card.gain {
+    border: 1px solid rgba(57, 233, 145, 0.55);
+    box-shadow: inset 0 0 24px rgba(57, 233, 145, 0.025);
+}
+
+.mover-card.loss {
+    border: 1px solid rgba(255, 83, 100, 0.58);
+    box-shadow: inset 0 0 24px rgba(255, 83, 100, 0.025);
+}
+
+.mover-left {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 12px;
+}
+
+.company-avatar {
+    width: 39px;
+    height: 39px;
+    flex: 0 0 39px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.company-avatar.gain {
+    border: 1px solid rgba(57, 233, 145, 0.28);
+}
+
+.company-avatar.loss {
+    border: 1px solid rgba(255, 83, 100, 0.28);
+}
+
+.mover-company {
+    color: #f6f8fb;
+    font-size: 0.88rem;
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 330px;
+}
+
+.mover-meta {
+    color: #8995aa;
+    font-size: 0.74rem;
+    margin-top: 2px;
+}
+
+.mover-right {
+    flex: 0 0 auto;
+    text-align: right;
+}
+
+.mover-price {
+    color: #f8fafc;
+    font-size: 0.84rem;
+    font-weight: 650;
+}
+
+.mover-change {
+    font-size: 0.76rem;
+    margin-top: 2px;
+    font-weight: 700;
+}
+
+.mover-change.gain {
+    color: var(--green);
+}
+
+.mover-change.loss {
+    color: var(--red);
+}
+
+/* =========================================================
+   NEWS
+   ========================================================= */
+
+.news-section-title {
+    margin: 1.25rem 0 0.7rem;
+}
+
+.prototype-news-card {
+    min-height: 91px;
+    padding: 14px 16px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, rgba(15, 24, 42, 0.95), rgba(8, 14, 26, 0.95));
+    border: 1px solid rgba(126, 150, 197, 0.22);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
+}
+
+.prototype-news-title {
+    color: #f6f8fb;
+    font-size: 0.92rem;
+    line-height: 1.42;
+    font-weight: 650;
+}
+
+.prototype-news-meta {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+    color: #8b97aa;
+    font-size: 0.74rem;
+    margin-top: 11px;
+}
+
+[data-testid="stImage"] img {
+    border-radius: 10px;
+    border: 1px solid rgba(126, 150, 197, 0.17);
+    max-height: 150px;
+    object-fit: cover;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.prototype-footer {
+    margin-top: 1.6rem;
+    padding: 0.9rem 0 0.25rem;
+    border-top: 1px solid rgba(137, 159, 204, 0.12);
+    color: #7f8a9e;
+    font-size: 0.73rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.footer-separator {
+    width: 1px;
+    height: 12px;
+    background: rgba(137, 159, 204, 0.25);
+}
+
+/* =========================================================
+   DASHBOARD NAVIGATION
+   ========================================================= */
+
+.dashboard-nav-brand {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.dashboard-nav-logo {
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.15rem;
+}
+
+.dashboard-nav-divider {
+    width: 1px;
+    height: 18px;
+    background: rgba(137, 159, 204, 0.25);
+}
+
+.dashboard-nav-label {
+    color: #8d99ad;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+}
+
+.dashboard-nav-status {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color: #5bd99b;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.dashboard-nav-line {
+    height: 1px;
+    background: rgba(137, 159, 204, 0.12);
+    margin: 0.15rem 0 1.2rem;
+}
+
+/* =========================================================
+   STREAMLIT CONTROLS / DASHBOARD POLISH
+   ========================================================= */
+
+.stButton > button,
+.stLinkButton > a {
+    min-height: 40px;
+    border-radius: 9px !important;
+    border: 1px solid rgba(126, 150, 197, 0.22) !important;
+    background: rgba(14, 23, 40, 0.82) !important;
+    color: #eaf0fb !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+}
+
+.stButton > button:hover,
+.stLinkButton > a:hover {
+    border-color: rgba(91, 140, 255, 0.65) !important;
+    background: rgba(25, 39, 66, 0.90) !important;
+    transform: none !important;
+}
+
+[data-testid="stMetric"] {
+    background: linear-gradient(135deg, rgba(15, 24, 42, 0.92), rgba(9, 15, 28, 0.92));
+    border: 1px solid rgba(126, 150, 197, 0.18);
+    border-radius: 11px;
+    padding: 15px 16px;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #8d99ad;
+}
+
+[data-testid="stMetricValue"] {
+    color: #f8fafc;
+}
+
+[data-testid="stDataFrame"],
+[data-testid="stTable"] {
+    border: 1px solid rgba(126, 150, 197, 0.15);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.js-plotly-plot {
+    border-radius: 11px;
+    overflow: hidden;
+}
+
+hr {
+    border-color: rgba(137, 159, 204, 0.12) !important;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+    .block-container {
+        padding-left: 0.9rem;
+        padding-right: 0.9rem;
+    }
+
+    .prototype-brand {
+        font-size: 2.6rem;
+    }
+
+    .prototype-market-price {
+        font-size: 1.35rem;
+    }
+
+    .mover-company {
+        max-width: 180px;
+    }
+
+    .dashboard-nav-label,
+    .dashboard-nav-status {
+        display: none;
+    }
+}
