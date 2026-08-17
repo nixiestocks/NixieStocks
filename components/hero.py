@@ -83,6 +83,7 @@ def _company_search_fragment():
     st.session_state["stock"] = selected_symbol
     st.session_state["page"] = "dashboard"
 
+    # Full app rerun only after the user actually selects a company.
     st.rerun()
 
 
