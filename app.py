@@ -13,7 +13,7 @@ from data.live_market import (
 
 
 st.set_page_config(
-    page_title="TEAM7",
+    page_title="NixieStocks",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -22,7 +22,7 @@ st.set_page_config(
 
 # =========================================================
 # HIDE STREAMLIT CLOUD TOP TOOLBAR
-# Keeps the TEAM7 animated stock ticker fully visible.
+# Keeps the NixieStocks animated stock ticker fully visible.
 # =========================================================
 
 st.markdown(
