@@ -57,7 +57,7 @@ def _company_search_fragment():
 
     selected_symbol = st_searchbox(
         search_company_options,
-        key="team7_company_search",
+        key="nixiestocks_company_search",
         placeholder="Search any listed company worldwide...",
         default=None,
         clear_on_submit=False,
@@ -92,7 +92,7 @@ def hero():
     st.markdown(
         """
         <div class="t7-hero">
-            <div class="t7-brand">TEAM7</div>
+            <div class="t7-brand">NixieStocks</div>
             <div class="t7-subtitle">AI STOCK MARKET ANALYST</div>
             <div class="t7-tagline">
                 Global market intelligence, technical analysis and AI forecasting
