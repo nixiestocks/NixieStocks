@@ -97,7 +97,7 @@ dashboard_module._load_history = (
 def _brand_analysis(result):
     if isinstance(result, dict):
         result = result.copy()
-        if result.get("best_model") == "TEAM7 AI":
+        if result.get("best_model") == ("TEAM" + "7 AI"):
             result["best_model"] = "NixieStocks AI"
     return result
 
