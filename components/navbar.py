@@ -19,7 +19,7 @@ def navbar():
             use_container_width=True,
         ):
             st.session_state.page = "home"
-            st.session_state.pop("team7_company_search", None)
+            st.session_state.pop("nixiestocks_company_search", None)
             st.session_state.pop("_last_search_selection", None)
             st.rerun()
 
@@ -27,7 +27,7 @@ def navbar():
         st.markdown(
             """
             <div class="dashboard-nav-brand">
-                <span class="dashboard-nav-logo">TEAM7</span>
+                <span class="dashboard-nav-logo">NixieStocks</span>
                 <span class="dashboard-nav-divider"></span>
                 <span class="dashboard-nav-label">Stock Intelligence Dashboard</span>
             </div>
