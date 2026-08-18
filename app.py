@@ -43,6 +43,23 @@ st.markdown(
     [data-testid="stAppViewContainer"] > section.main {
         top: 0 !important;
     }
+
+    /* Rebrand the two legacy AI signal labels without touching the
+       dashboard layout/CSS architecture. */
+    .t7-signal-shell .t7-lower-subtitle,
+    .t7-signal-kicker {
+        font-size: 0 !important;
+    }
+
+    .t7-signal-shell .t7-lower-subtitle::after {
+        content: "Condensed view of NixieStocks AI recommendation engine";
+        font-size: .72rem;
+    }
+
+    .t7-signal-kicker::after {
+        content: "NixieStocks AI SIGNAL";
+        font-size: .68rem;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -73,6 +90,42 @@ dashboard_module._load_stock_info = (
 
 dashboard_module._load_history = (
     load_dashboard_history
+)
+
+
+# Normalize the legacy fallback model label to the new brand.
+def _brand_analysis(result):
+    if isinstance(result, dict):
+        result = result.copy()
+        if result.get("best_model") == "TEAM7 AI":
+            result["best_model"] = "NixieStocks AI"
+    return result
+
+
+if not hasattr(dashboard_module, "_nixie_original_analyze_stock_ai"):
+    dashboard_module._nixie_original_analyze_stock_ai = (
+        dashboard_module.analyze_stock_ai
+    )
+    dashboard_module._nixie_original_analyze_stock_ai_from_history = (
+        dashboard_module.analyze_stock_ai_from_history
+    )
+
+
+def _nixie_analyze_stock_ai(symbol):
+    return _brand_analysis(
+        dashboard_module._nixie_original_analyze_stock_ai(symbol)
+    )
+
+
+def _nixie_analyze_stock_ai_from_history(history):
+    return _brand_analysis(
+        dashboard_module._nixie_original_analyze_stock_ai_from_history(history)
+    )
+
+
+dashboard_module.analyze_stock_ai = _nixie_analyze_stock_ai
+dashboard_module.analyze_stock_ai_from_history = (
+    _nixie_analyze_stock_ai_from_history
 )
 
 
