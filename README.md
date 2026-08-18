@@ -13,7 +13,7 @@ streamlit run app.py
 
 Use these deployment settings:
 
-- Project: `NixieStocks`
+- Repository: `nixiestocks/NixieStocks`
 - Branch: `main`
 - Main file path: `app.py`
 - Python: `3.11`
