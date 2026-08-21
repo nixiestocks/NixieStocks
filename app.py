@@ -3,6 +3,7 @@ import streamlit as st
 import components.home as home_module
 import components.dashboard as dashboard_module
 
+from data.company_fundamentals import enrich_stock_info
 from data.live_market import (
     load_live_home_market_data,
     load_live_market_status,
@@ -84,8 +85,14 @@ dashboard_module._load_market_status = (
     load_live_market_status
 )
 
+
+def _load_enriched_stock_info(symbol):
+    base_info = load_live_stock_info(symbol)
+    return enrich_stock_info(symbol, base_info)
+
+
 dashboard_module._load_stock_info = (
-    load_live_stock_info
+    _load_enriched_stock_info
 )
 
 dashboard_module._load_history = (
