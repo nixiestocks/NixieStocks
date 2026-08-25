@@ -4,6 +4,7 @@ import components.home as home_module
 import components.dashboard as dashboard_module
 
 from data.company_fundamentals import enrich_stock_info
+from data.forecast_safety import stabilize_analysis
 from data.live_market import (
     load_live_home_market_data,
     load_live_market_status,
@@ -119,14 +120,40 @@ if not hasattr(dashboard_module, "_nixie_original_analyze_stock_ai"):
 
 
 def _nixie_analyze_stock_ai(symbol):
+    result = dashboard_module._nixie_original_analyze_stock_ai(
+        symbol
+    )
+
+    history = load_dashboard_history(
+        symbol,
+        "1y",
+    )
+
+    result = stabilize_analysis(
+        history,
+        result,
+    )
+
     return _brand_analysis(
-        dashboard_module._nixie_original_analyze_stock_ai(symbol)
+        result
     )
 
 
 def _nixie_analyze_stock_ai_from_history(history):
+    result = (
+        dashboard_module
+        ._nixie_original_analyze_stock_ai_from_history(
+            history
+        )
+    )
+
+    result = stabilize_analysis(
+        history,
+        result,
+    )
+
     return _brand_analysis(
-        dashboard_module._nixie_original_analyze_stock_ai_from_history(history)
+        result
     )
 
 
