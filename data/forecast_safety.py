@@ -42,7 +42,15 @@ def _clean_history(history):
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
 
-    if "Close" not in df.columns:
+    if "Close" not in df.columns or list(df.columns).count("Close") != 1:
+        return None
+
+    # Rolling features and the chronological validation split require ordered,
+    # unique observations. Keep the latest value when a provider repeats a date.
+    try:
+        df = df.sort_index(kind="stable")
+        df = df.loc[~df.index.duplicated(keep="last")]
+    except Exception:
         return None
 
     df["Close"] = pd.to_numeric(df["Close"], errors="coerce")
@@ -90,10 +98,16 @@ def _plausible_change_limit(close):
     daily_vol = _safe_float(recent.std()) or 0.02
     volatility_limit = 3.5 * daily_vol * np.sqrt(HORIZON_DAYS)
 
-    horizon_returns = close.pct_change(HORIZON_DAYS).dropna().tail(120)
+    horizon_returns = close.pct_change(HORIZON_DAYS).replace(
+        [np.inf, -np.inf], np.nan
+    ).dropna().tail(120)
     historical_limit = 0.0
 
     if not horizon_returns.empty:
+        if len(horizon_returns) >= 20:
+            low = horizon_returns.quantile(0.05)
+            high = horizon_returns.quantile(0.95)
+            horizon_returns = horizon_returns.clip(lower=low, upper=high)
         historical_limit = float(horizon_returns.abs().quantile(0.95)) * 1.5
 
     # Minimum room prevents over-clamping normal stocks; the hard maximum
@@ -205,12 +219,15 @@ def build_safe_30_day_forecast(history):
         return None
 
     split = int(len(training) * 0.80)
+    train_end = split - HORIZON_DAYS
 
-    if split < 45 or len(training) - split < 8:
+    # Targets are 30 sessions ahead. Without an embargo, the last training
+    # labels reach into the validation feature period and overstate accuracy.
+    if train_end < 45 or len(training) - split < 8:
         return None
 
-    train_x = training[FEATURE_COLUMNS].iloc[:split]
-    train_y = training["Target"].iloc[:split]
+    train_x = training[FEATURE_COLUMNS].iloc[:train_end]
+    train_y = training["Target"].iloc[:train_end]
     test_x = training[FEATURE_COLUMNS].iloc[split:]
     test_y = training["Target"].iloc[split:]
 
@@ -279,11 +296,29 @@ def stabilize_analysis(history, result):
 
         if current_price and forecast_price:
             raw_change = abs((forecast_price - current_price) / current_price)
-            if raw_change > 0.50:
+
+            # Apply the same data-driven limit even when there is not enough
+            # history to train the replacement model. Fall back to the hard
+            # 50% ceiling only if the available close data is unusable.
+            legacy_limit = 0.50
+            try:
+                close = history.copy()
+                if isinstance(close.columns, pd.MultiIndex):
+                    close.columns = close.columns.get_level_values(0)
+                if list(close.columns).count("Close") == 1:
+                    close = pd.to_numeric(close["Close"], errors="coerce")
+                    close = close.replace([np.inf, -np.inf], np.nan).dropna()
+                    if len(close) >= 2:
+                        legacy_limit = _plausible_change_limit(close)
+            except Exception:
+                pass
+
+            if raw_change > legacy_limit:
                 updated["forecast_price"] = None
                 updated["forecast_change"] = None
                 updated["best_model"] = "Forecast unavailable"
                 updated["forecast_guarded"] = True
+                updated["forecast_limit_pct"] = legacy_limit * 100.0
 
         return updated
 
