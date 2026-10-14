@@ -12,6 +12,11 @@ from sklearn.metrics import (
     r2_score
 )
 
+from data.forecast_safety import (
+    build_safe_30_day_forecast,
+    is_forecast_path_plausible,
+)
+
 # =========================================================
 # TENSORFLOW / LSTM
 # =========================================================
@@ -99,6 +104,11 @@ def clean_history(history):
     df = df.dropna(
         subset=["Date", "Close"]
     )
+
+    # Zero or negative closing prices are invalid for an equity forecast.
+    df = df[df["Close"] > 0]
+    if df.empty:
+        return None
 
     df = df.sort_values(
         "Date"
@@ -1065,16 +1075,68 @@ def prediction(history):
         )
 
     # =====================================================
-    # FORECAST CHECK
+    # FORECAST SAFETY CHECK
     # =====================================================
 
-    if len(forecast) == 0:
+    current_price = float(
+        history_df["Close"].iloc[-1]
+    )
+    forecast_note = None
+    forecast_label = "AI Forecast"
 
-        st.warning(
-            "Unable to generate the 30-day forecast."
+    # Recursive forecasts can diverge when predictions are fed back into
+    # the model. Never render invalid values or a path outside a broad
+    # 30-day plausibility band.
+    if (
+        len(forecast) != 30
+        or not is_forecast_path_plausible(
+            current_price,
+            forecast,
+        )
+    ):
+        safe_forecast = build_safe_30_day_forecast(
+            history_df
         )
 
-        return
+        try:
+            safe_price = float(
+                safe_forecast["forecast_price"]
+            ) if safe_forecast else np.nan
+        except (KeyError, TypeError, ValueError):
+            safe_price = np.nan
+
+        if (
+            not np.isfinite(safe_price)
+            or not is_forecast_path_plausible(
+                current_price,
+                [safe_price],
+                max_daily_change=None,
+            )
+        ):
+            st.warning(
+                "The AI model produced an unstable 30-day forecast, "
+                "so NixieStocks hid it rather than displaying misleading "
+                "prices. Refresh the data or try another stock."
+            )
+            return
+
+        # Only the 30-day endpoint is modeled in this fallback. Intermediate
+        # values are a visual guide, not separate daily model predictions.
+        forecast = np.linspace(
+            current_price,
+            safe_price,
+            30,
+        ).tolist()
+        best_model_name = safe_forecast.get(
+            "best_model",
+            "Stabilized Trend",
+        )
+        forecast_label = "Illustrative path to 30-day estimate"
+        forecast_note = (
+            "The original day-by-day forecast was unstable. This line shows "
+            "an illustrative path to a guarded 30-day estimate; only the "
+            "endpoint is modeled."
+        )
 
     # =====================================================
     # FUTURE DATES
@@ -1118,7 +1180,7 @@ def prediction(history):
             x=future_dates,
             y=forecast,
             mode="lines+markers",
-            name="AI Forecast"
+            name=forecast_label
         )
     )
 
@@ -1138,14 +1200,12 @@ def prediction(history):
         use_container_width=True
     )
 
+    if forecast_note:
+        st.info(forecast_note)
+
     # =====================================================
     # FORECAST RESULTS
     # =====================================================
-
-    current_price = float(
-        history_df["Close"]
-        .iloc[-1]
-    )
 
     predicted_price = float(
         forecast[-1]
