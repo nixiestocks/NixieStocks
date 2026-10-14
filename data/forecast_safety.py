@@ -33,6 +33,48 @@ def _safe_float(value):
         return None
 
 
+def is_forecast_path_plausible(
+    current_price,
+    forecast,
+    *,
+    max_total_change=0.50,
+    max_daily_change=0.30,
+):
+    """Reject invalid or unstable forecast paths before displaying them.
+
+    The total-move cap is measured against the current price, while the
+    optional daily cap checks each forecast point against the previous point.
+    """
+    current = _safe_float(current_price)
+
+    if current is None or current <= 0 or forecast is None:
+        return False
+
+    try:
+        values = np.asarray(forecast, dtype=float).reshape(-1)
+    except (TypeError, ValueError):
+        return False
+
+    if (
+        values.size == 0
+        or not np.isfinite(values).all()
+        or np.any(values <= 0)
+    ):
+        return False
+
+    total_changes = np.abs(values / current - 1.0)
+    if np.any(total_changes > float(max_total_change) + 1e-9):
+        return False
+
+    if max_daily_change is not None:
+        previous = np.concatenate(([current], values[:-1]))
+        daily_changes = np.abs(values / previous - 1.0)
+        if np.any(daily_changes > float(max_daily_change) + 1e-9):
+            return False
+
+    return True
+
+
 def _clean_history(history):
     if history is None or getattr(history, "empty", True):
         return None
