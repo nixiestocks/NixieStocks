@@ -89,6 +89,7 @@ def _clean_history(history):
 
     df["Close"] = pd.to_numeric(df["Close"], errors="coerce")
     df = df.dropna(subset=["Close"])
+    df = df[df["Close"] > 0]
 
     if len(df) < 90:
         return None
