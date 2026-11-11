@@ -5,15 +5,15 @@ import logging
 from datetime import datetime
 from urllib.parse import quote
 
-
-logger = logging.getLogger(__name__)
-
 import numpy as np
 import pandas as pd
 import streamlit as st
 import yfinance as yf
 
 from components.hero import hero
+
+
+logger = logging.getLogger(__name__)
 
 
 MARKETS = {
