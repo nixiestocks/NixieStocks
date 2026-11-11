@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import logging
 from datetime import datetime
 from urllib.parse import quote
 
@@ -10,6 +11,9 @@ import streamlit as st
 import yfinance as yf
 
 from components.hero import hero
+
+
+logger = logging.getLogger(__name__)
 
 
 MARKETS = {
@@ -775,47 +779,109 @@ def _clean_news_item(item):
     }
 
 
-@st.cache_data(ttl=1800, show_spinner=False)
-def _load_news():
+def _clean_news_items(raw_news, limit=3):
+    """Normalize and deduplicate Yahoo Finance news results."""
+    cleaned = []
+    seen = set()
 
+    for item in raw_news or []:
+        article = _clean_news_item(item)
+
+        if not article:
+            continue
+
+        identity = article["url"] or article["title"]
+        if identity in seen:
+            continue
+
+        seen.add(identity)
+        cleaned.append(article)
+
+        if len(cleaned) >= limit:
+            break
+
+    return cleaned
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def _load_news():
+    """Fetch general market news with short-lived caching and fallbacks."""
+
+    # Primary source: Yahoo Finance Search. max_results controls quote
+    # results; news_count controls the number of requested news articles.
     try:
         try:
             search = yf.Search(
-                "global stock market",
-                max_results=0,
-                news_count=6,
+                "stock market",
+                max_results=8,
+                news_count=8,
                 lists_count=0,
-                include_cb=True,
+                include_cb=False,
                 include_nav_links=False,
                 include_research=False,
-                timeout=6,
-                raise_errors=False,
+                timeout=20,
+                raise_errors=True,
             )
         except TypeError:
+            # Compatibility path for older yfinance releases.
             search = yf.Search(
-                "global stock market",
-                max_results=0,
-                news_count=6,
+                "stock market",
+                max_results=8,
+                news_count=8,
+                lists_count=0,
             )
 
-        raw = getattr(search, "news", []) or []
+        articles = _clean_news_items(
+            getattr(search, "news", []) or []
+        )
 
-        cleaned = []
+        if articles:
+            return articles
 
-        for item in raw:
-            article = _clean_news_item(item)
+        logger.warning(
+            "Yahoo Finance Search returned no readable market-news articles."
+        )
 
-            if article:
-                cleaned.append(article)
+    except Exception as exc:
+        logger.warning(
+            "Yahoo Finance Search failed while loading market news: %s",
+            exc,
+        )
 
-            if len(cleaned) == 3:
-                break
+    # Fallback: request news directly from a broad-market index and ETF.
+    # Ticker.get_news() returns Yahoo's newer nested article structure;
+    # _clean_news_item() also accepts the older flat format.
+    for symbol in ("^GSPC", "SPY"):
+        try:
+            ticker = yf.Ticker(symbol)
+            get_news = getattr(ticker, "get_news", None)
 
-        return cleaned
+            if callable(get_news):
+                raw_news = get_news(
+                    count=8,
+                    tab="news",
+                )
+            else:
+                raw_news = getattr(ticker, "news", []) or []
 
-    except Exception:
-        return []
+            articles = _clean_news_items(raw_news)
 
+            if articles:
+                return articles
+
+            logger.warning(
+                "Yahoo Finance returned no market-news articles for %s.",
+                symbol,
+            )
+
+        except Exception as exc:
+            logger.warning(
+                "Yahoo Finance ticker-news fallback failed for %s: %s",
+                symbol,
+                exc,
+            )
+
+    return []
 
 # =========================================================
 # RENDERING
